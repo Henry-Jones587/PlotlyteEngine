@@ -1,0 +1,115 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Text Adventure Game Format",
+  "description": "This is the structure of your game file. You edit it to make your own adventure!",
+  "type": "object",
+  "required": ["version", "title", "start", "stages"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Just leave this alone. It helps computers know how to read this file.",
+      "default": "./game_schema.json"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+$",
+      "description": "Version of the game format (like '1.0'). If we change how the format works in the future, this helps keep things working."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The name of your game. This shows on the game screen."
+    },
+    "start": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The first stage (room) where your game begins. Use the name of one of your stages."
+    },
+    "items": {
+      "type": "object",
+      "description": "A list of special things your player can collect, like keys, potions, or magical stones.",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["name", "description"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "What the item is called (like 'Magic Stone')."
+          },
+          "description": {
+            "type": "string",
+            "description": "A sentence describing the item. This is shown to the player."
+          },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" },
+            "uniqueItems": true,
+            "description": "Extra words to describe what kind of item it is (like 'key', 'consumable', 'magic'). These can help control how items work."
+          },
+          "effects": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Things that happen when the player uses this item. You can leave this empty if you want."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "stages": {
+      "type": "object",
+      "description": "Each stage is a place your player can go (like a room or scene). Use a short name as the key for each one.",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["description", "options"],
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "What the player sees or reads when they enter this place."
+          },
+          "options": {
+            "type": "array",
+            "minItems": 0,
+            "description": "The choices the player has in this place. Each one can lead to another stage. Set it to [] to end the game.",
+            "items": {
+              "type": "object",
+              "required": ["label", "target"],
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "description": "What the player will see on the screen for this choice (like a button or a menu option)."
+                },
+                "target": {
+                  "type": "string",
+                  "description": "The name of the stage (room) that this choice leads to."
+                },
+                "condition": {
+                  "type": "object",
+                  "description": "Use this to hide this choice unless certain things are true.",
+                  "properties": {
+                    "has_item": {
+                      "type": "string",
+                      "description": "Only show this option if the player has a certain item."
+                    },
+                    "flag_set": {
+                      "type": "string",
+                      "description": "Only show this option if a specific flag has been set (like a memory that something happened)."
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "effects": {
+                  "type": "object",
+                  "description": "Use this to make something happen when the player chooses this option, like giving them an item or setting a flag.",
+                  "additionalProperties": true
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
