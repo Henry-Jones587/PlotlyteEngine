@@ -85,7 +85,7 @@ class Game:
             ]
 
             if not available_options:
-                print("No options available. Game over or dead end.")
+                print("Game Over!")
                 return
 
             print("\nOptions:")
@@ -117,4 +117,5 @@ class Game:
             self.apply_effects(selected_option.get("effects"))
             current_stage = selected_option["target"]
 if __name__ == "__main__":
+
     Game()
