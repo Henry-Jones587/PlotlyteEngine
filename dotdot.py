@@ -52,10 +52,14 @@ class DotDot:
         except DprintTooLong as e:
             return DotDot.dprint(e.message, wait)
     @staticmethod
-    def credits(message=""):
-        # Add messages with this format: " for (application name here)"
+    def credits(message="", extended=False):
         DotDot.credit = True
-        DotDot.dprint(f"Starting DotDot Utilities{message}...", 0.05)
+        if message != "":
+            DotDot.dprint(f"Starting DotDot Utilities for {message}...", 0.05)
+        else:
+            DotDot.dprint(f"Starting DotDot Utilities...", 0.05)
+        if extended:
+            DotDot.dprint(f"DotDot x {message}", 0.05)
         DotDot.dprint("By Henry Jones", 0.05)
         DotDot.dprint("Version 1.0", 0.05)
 
@@ -91,4 +95,5 @@ if __name__ == "__main__":
     Sed sit amet magna pharetra, rhoncus ligula lobortis, malesuada diam. Vestibulum accumsan nulla id viverra feugiat. Aenean vitae lectus tempor, rutrum diam eget, interdum leo. Duis consectetur odio nec porttitor imperdiet. Sed massa elit, ultricies at tincidunt nec, fringilla id mi. Proin facilisis nunc dictum, pretium quam in, porta est. Nulla rhoncus nulla eu sem porttitor laoreet.
     """
     DotDot.credits()
+
     DotDot.dprint(LoremIpsum, 0.01)
