@@ -4,7 +4,7 @@ import sys
 import random
 import time
 from dotdot import *
-DotDot.credits(" for Plotlyte")
+DotDot.credits("Plotlyte")
 print("\n"*2)
 class Game:
     def __init__(self):
@@ -136,3 +136,4 @@ class Game:
             current_stage = selected_option["target"]
 if __name__ == "__main__":
     Game()
+
