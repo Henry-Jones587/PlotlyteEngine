@@ -8,7 +8,8 @@ class DprintTooLong(Exception):
         super().__init__(self.message)
 
 class DotDot:
-#Thanks to rene-d for all the colour codes!
+    SyntaxVer = float(1.1)
+    #Thanks to rene-d for all the colour codes!
     colours = {
         "BLACK": "\033[0;30m",
         "RED": "\033[0;31m",
@@ -37,7 +38,7 @@ class DotDot:
     }
     credit = False
     @staticmethod
-    def dprint(text, wait=0.05):
+    def dprint(text, wait=0.05, colour=None, bold=False, italic=False, underline=False):
         if not DotDot.credit:
             DotDot.credits()
         try:
@@ -45,12 +46,30 @@ class DotDot:
                 raise DprintTooLong()
             if len(text) < 1:
                 return None
-            for char in text:
-                print(char, end="", flush=True)
-                time.sleep(wait)
-            print()
+            if DotDot.SyntaxVer == 1.0:
+                for char in text:
+                    print(char, end="", flush=True)
+            elif DotDot.SyntaxVer == 1.1:
+                if italic:
+                    print(DotDot.colour("ITALIC"), end="", flush=True)
+                if underline:
+                    print(DotDot.colour("UNDERLINE"), end="", flush=True)
+                if colour is not None:
+                    print(colour, end="", flush=True)
+                if bold:
+                    print(DotDot.colour("BOLD"), end="", flush=True)
+                for char in text:
+                    print(char, end="", flush=True)
+                    time.sleep(wait)
+                if bold or colour is not None or italic:
+                    print(DotDot.colour("END"))
+            else:
+                raise ValueError("Invalid SyntaxVer. Please use 1.1 (recommended) or 1.0")
+            print()  # New line at the end
         except DprintTooLong as e:
             return DotDot.dprint(e.message, wait)
+        except ValueError as e:
+            return DotDot.dprint(f"Error: {e}", wait)
     @staticmethod
     def credits(message="", extended=False):
         DotDot.credit = True
@@ -58,8 +77,8 @@ class DotDot:
             DotDot.dprint(f"Starting DotDot Utilities for {message}...", 0.05)
         else:
             DotDot.dprint(f"Starting DotDot Utilities...", 0.05)
-        if extended:
-            DotDot.dprint(DotDot.colour(RED) + DotDot.colour(BOLD) + f"DotDot x {message}" + DotDot.colour(END), 0.05)
+        if extended and message != "":
+            DotDot.dprint(DotDot.colour("RED") + DotDot.colour("BOLD") + f"DotDot x {message}" + DotDot.colour("END"), 0.05)
         DotDot.dprint("By Henry Jones", 0.05)
         DotDot.dprint("Version 1.1", 0.05)
 
@@ -68,8 +87,9 @@ class DotDot:
         return DotDot.colours.get(colour, "")
 
     @staticmethod
-    def load():
-        for i in range(random.randint(5, 50)):
+    def load(length=[5, 20]):
+        wait = random.randint(length[0], length[1])
+        for i in range(0, wait):
             print(f"Loading{'.' * (i % 4)}", end='\r')
             print(" " * 20, end='\r')  # Clear the line
             print(f"Loading{'.' * (i % 4)}", end='\r')
@@ -97,4 +117,6 @@ if __name__ == "__main__":
     DotDot.credits()
 
     DotDot.dprint(LoremIpsum, 0.01)
+
+
 

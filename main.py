@@ -6,6 +6,7 @@ import time
 from dotdot import *
 DotDot.credits("Plotlyte")
 print("\n"*2)
+DotDot.SyntaxVer = 1.0
 class Game:
     def __init__(self):
         self.flags = {}
@@ -136,4 +137,5 @@ class Game:
             current_stage = selected_option["target"]
 if __name__ == "__main__":
     Game()
+
 
