@@ -8,7 +8,8 @@ class DprintTooLong(Exception):
         super().__init__(self.message)
 
 class DotDot:
-#Thanks to rene-d for all the colour codes!
+    SyntaxVer = float(1.1)
+    #Thanks to rene-d for all the colour codes!
     colours = {
         "BLACK": "\033[0;30m",
         "RED": "\033[0;31m",
@@ -37,7 +38,7 @@ class DotDot:
     }
     credit = False
     @staticmethod
-    def dprint(text, wait=0.05):
+    def dprint(text, wait=0.05, colour=None):
         if not DotDot.credit:
             DotDot.credits()
         try:
@@ -45,21 +46,32 @@ class DotDot:
                 raise DprintTooLong()
             if len(text) < 1:
                 return None
-            for char in text:
-                print(char, end="", flush=True)
-                time.sleep(wait)
-            print()
+            if DotDot.SyntaxVer == 1.0:
+                for char in text:
+                    print(char, end="", flush=True)
+            elif DotDot.SyntaxVer == 1.1:
+                if colour is not None:
+                    print(colour, end="", flush=True)
+                for char in text:
+                    print(char, end="", flush=True)
+                    time.sleep(wait)
+                if colour is not None:
+                    print(DotDot.colour("END"))
+            else:
+                raise ValueError("Invalid SyntaxVer. Please use 1.1 (recommended) or 1.0")
         except DprintTooLong as e:
             return DotDot.dprint(e.message, wait)
+        except ValueError as e:
+            return DotDot.dprint(f"Error: {e}", wait)
     @staticmethod
     def credits(message="", extended=False):
         DotDot.credit = True
-        if message != "":
+        if message is not "":
             DotDot.dprint(f"Starting DotDot Utilities for {message}...", 0.05)
         else:
             DotDot.dprint(f"Starting DotDot Utilities...", 0.05)
         if extended:
-            DotDot.dprint(DotDot.colour(RED) + DotDot.colour(BOLD) + f"DotDot x {message}" + DotDot.colour(END), 0.05)
+            DotDot.dprint(DotDot.colour("RED") + DotDot.colour("BOLD") + f"DotDot x {message}" + DotDot.colour("END"), None, 0.05)
         DotDot.dprint("By Henry Jones", 0.05)
         DotDot.dprint("Version 1.1", 0.05)
 
@@ -97,4 +109,5 @@ if __name__ == "__main__":
     DotDot.credits()
 
     DotDot.dprint(LoremIpsum, 0.01)
+
 
