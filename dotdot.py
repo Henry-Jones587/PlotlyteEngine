@@ -38,7 +38,7 @@ class DotDot:
     }
     credit = False
     @staticmethod
-    def dprint(text, wait=0.05, colour=None):
+    def dprint(text, wait=0.05, colour=None, bold=False, italic=False, underline=False):
         if not DotDot.credit:
             DotDot.credits()
         try:
@@ -50,12 +50,18 @@ class DotDot:
                 for char in text:
                     print(char, end="", flush=True)
             elif DotDot.SyntaxVer == 1.1:
+                if italic:
+                    print(DotDot.colour("ITALIC"), end="", flush=True)
+                if underline:
+                    print(DotDot.colour("UNDERLINE"), end="", flush=True)
                 if colour is not None:
                     print(colour, end="", flush=True)
+                if bold:
+                    print(DotDot.colour("BOLD"), end="", flush=True)
                 for char in text:
                     print(char, end="", flush=True)
                     time.sleep(wait)
-                if colour is not None:
+                if bold or colour is not None or italic:
                     print(DotDot.colour("END"))
             else:
                 raise ValueError("Invalid SyntaxVer. Please use 1.1 (recommended) or 1.0")
@@ -71,8 +77,8 @@ class DotDot:
             DotDot.dprint(f"Starting DotDot Utilities for {message}...", 0.05)
         else:
             DotDot.dprint(f"Starting DotDot Utilities...", 0.05)
-        if extended:
-            DotDot.dprint(DotDot.colour("RED") + DotDot.colour("BOLD") + f"DotDot x {message}" + DotDot.colour("END"), None, 0.05)
+        if extended and message != "":
+            DotDot.dprint(DotDot.colour("RED") + DotDot.colour("BOLD") + f"DotDot x {message}" + DotDot.colour("END"), 0.05)
         DotDot.dprint("By Henry Jones", 0.05)
         DotDot.dprint("Version 1.1", 0.05)
 
@@ -111,5 +117,6 @@ if __name__ == "__main__":
     DotDot.credits()
 
     DotDot.dprint(LoremIpsum, 0.01)
+
 
 
