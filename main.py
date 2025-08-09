@@ -2,11 +2,19 @@ import json
 import os
 
 class Game:
+    def cls():
+        # Check the operating system name
+        if os.name == 'nt':  # 'nt' refers to Windows
+            _ = os.system('cls')
+        else:  # For Unix-like systems (Linux, macOS)
+            _ = os.system('clear')
+
     def __init__(self):
         self.flags = {}
         self.inventory = []
         self.load_game()
         self.run()
+        cls()
 
     def load_game(self):
         while True:
@@ -119,3 +127,4 @@ class Game:
 if __name__ == "__main__":
 
     Game()
+
