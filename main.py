@@ -1,6 +1,11 @@
 import json
 import os
-
+import sys
+import random
+import time
+from dotdot import *
+DotDot.credits("Plotlyte")
+print("\n"*2)
 class Game:
     def __init__(self):
         self.flags = {}
@@ -9,6 +14,21 @@ class Game:
         self.run()
 
     def load_game(self):
+        # Check if a filename argument was provided
+        if len(sys.argv) > 1:
+            game = sys.argv[1]
+            if not game.endswith(".json"):
+                game += ".json"
+            path = game
+            if os.path.exists(path):
+                with open(path, "r") as f:
+                    self.gamedata = json.load(f)
+                DotDot.load()
+                print(f"Loaded game '{self.gamedata.get('title', 'Untitled')}' (version {self.gamedata.get('version', 'unknown')})")
+                return
+            else:
+                print(f"File '{path}' not found. Falling back to prompt.")
+        # Prompt user for filename if not provided or not found
         while True:
             game = input("Enter the file name of the game (without .json): ").strip()
             if not game:
@@ -20,6 +40,7 @@ class Game:
                 continue
             with open(path, "r") as f:
                 self.gamedata = json.load(f)
+            DotDot.load()
             print(f"Loaded game '{self.gamedata.get('title', 'Untitled')}' (version {self.gamedata.get('version', 'unknown')})")
             break
 
@@ -47,18 +68,15 @@ class Game:
             if effect == "add_item":
                 if value not in self.inventory:
                     self.inventory.append(value)
-                    print(f"You picked up a {self.gamedata['items'][value]['name']}!")
-
+                    DotDot.dprint(DotDot.colour("BLUE") + f"You picked up a {self.gamedata['items'][value]['name']}!" + DotDot.colour("END"))
             elif effect == "remove_item":
                 if value in self.inventory:
                     self.inventory.remove(value)
-                    print(f"You lost: {value}!")
+                    DotDot.dprint(DotDot.colour("RED") + f"You lost: {value}!" + DotDot.colour("END"))
             elif effect == "set_flag":
                 self.flags[value] = True
-                print(f"Flag set: {value}")
             elif effect == "clear_flag":
                 self.flags[value] = False
-                print(f"Flag cleared: {value}")
             elif effect == "restore_hp":
                 # Placeholder for future health system
                 print(f"You restore {value} HP. (Health system not implemented yet.)")
@@ -77,7 +95,7 @@ class Game:
                 print(f"Error: Stage '{current_stage}' not found.")
                 return
 
-            print("\n" + stage["description"])
+            DotDot.dprint("\n" + DotDot.colour("YELLOW") + stage["description"], 0.01)
             # Filter options by condition
             available_options = [
                 option for option in stage["options"]
@@ -85,37 +103,37 @@ class Game:
             ]
 
             if not available_options:
-                print("Game Over!")
-                return
+                DotDot.dprint("Thanks for playing!")
+                break
 
-            print("\nOptions:")
+            DotDot.dprint("\nOptions:")
             for i, option in enumerate(available_options, 1):
-                print(f"{i}. {option['label']}")
+                DotDot.dprint(f"{i}. {option['label']}")
 
-            print("Type the number of your choice, or 'inventory' to see your items, or 'quit' to exit.")
+            DotDot.dprint(DotDot.colour("GREEN") + "Type the number of your choice, or 'inventory' to see your items, or 'quit' to exit." + DotDot.colour("END"))
 
             choice = input("> ").strip().lower()
             if choice == "quit":
-                print("Thanks for playing!")
+                DotDot.dprint("Thanks for playing!" + DotDot.colour("END"))
                 break
             elif choice == "inventory":
                 if self.inventory:
-                    print("You have:")
+                    DotDot.dprint("You have:")
                     for item in self.inventory:
                         item_data = self.gamedata.get("items", {}).get(item)
                         name = item_data["name"] if item_data else item
-                        print(f"- {name}")
+                        DotDot.dprint(f"- {name}")
                 else:
-                    print("Your inventory is empty.")
+                    DotDot.dprint("Your inventory is empty.")
                 continue
 
             if not choice.isdigit() or int(choice) < 1 or int(choice) > len(available_options):
-                print("Invalid choice. Try again.")
+                DotDot.dprint(DotDot.colour("RED") + "Invalid choice. Try again." + DotDot.colour("END"))
                 continue
 
             selected_option = available_options[int(choice) - 1]
             self.apply_effects(selected_option.get("effects"))
             current_stage = selected_option["target"]
 if __name__ == "__main__":
-
     Game()
+
