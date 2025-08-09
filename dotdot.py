@@ -59,9 +59,9 @@ class DotDot:
         else:
             DotDot.dprint(f"Starting DotDot Utilities...", 0.05)
         if extended:
-            DotDot.dprint(f"DotDot x {message}", 0.05)
+            DotDot.dprint(DotDot.colour(RED) + DotDot.colour(BOLD) + f"DotDot x {message}" + DotDot.colour(END), 0.05)
         DotDot.dprint("By Henry Jones", 0.05)
-        DotDot.dprint("Version 1.0", 0.05)
+        DotDot.dprint("Version 1.1", 0.05)
 
     @staticmethod
     def colour(colour):
@@ -97,3 +97,4 @@ if __name__ == "__main__":
     DotDot.credits()
 
     DotDot.dprint(LoremIpsum, 0.01)
+
