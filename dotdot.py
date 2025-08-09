@@ -59,6 +59,7 @@ class DotDot:
                     print(DotDot.colour("END"))
             else:
                 raise ValueError("Invalid SyntaxVer. Please use 1.1 (recommended) or 1.0")
+            print()  # New line at the end
         except DprintTooLong as e:
             return DotDot.dprint(e.message, wait)
         except ValueError as e:
@@ -66,7 +67,7 @@ class DotDot:
     @staticmethod
     def credits(message="", extended=False):
         DotDot.credit = True
-        if message is not "":
+        if message != "":
             DotDot.dprint(f"Starting DotDot Utilities for {message}...", 0.05)
         else:
             DotDot.dprint(f"Starting DotDot Utilities...", 0.05)
@@ -80,8 +81,9 @@ class DotDot:
         return DotDot.colours.get(colour, "")
 
     @staticmethod
-    def load():
-        for i in range(random.randint(5, 50)):
+    def load(length=[5, 20]):
+        wait = random.randint(length[0], length[1])
+        for i in range(0, wait):
             print(f"Loading{'.' * (i % 4)}", end='\r')
             print(" " * 20, end='\r')  # Clear the line
             print(f"Loading{'.' * (i % 4)}", end='\r')
