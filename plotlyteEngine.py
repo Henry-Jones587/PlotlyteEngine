@@ -6,21 +6,9 @@ import random
 import os
 import sys
 import json
-
-# Optional dependencies
-try:
-    from PIL import Image
-    PIL_AVAILABLE = True
-except Exception:
-    PIL_AVAILABLE = False
-
-try:
-    import pygame
-    from pygame.locals import *
-except ImportError:
-    subprocess.run(["pip", "install", "pygame"])
-    import pygame
-    from pygame.locals import *
+import pygame
+from pygame.locals import *
+from PIL import Image
 
 # --- Optional: DotDot credits (won't crash if not installed) ---
 try:
@@ -148,9 +136,6 @@ class Texture:
             "attack": [4,5,6,7]
         }
         """
-        if not PIL_AVAILABLE:
-            raise RuntimeError("Pillow (PIL) is required for Texture.animated().")
-
         with Image.open(filename) as img:
             frames = []
             for i in range(getattr(img, "n_frames", 1)):
@@ -265,6 +250,20 @@ class MainLoop:
                 if isinstance(entity, Pawn) and entity.hitbox and self.player.hitbox:
                     if entity.hitbox.collides_with(self.player.hitbox):
                         self.player.health = max(0.0, self.player.health - 10.0 * dt)
+            # Collision: AI vs AI
+            for i, entity in enumerate(self.game.entities):
+                if not entity.hitbox:
+                    continue
+                for other in self.game.entities[i+1:]:
+                    if not other.hitbox:
+                        continue
+                    if entity.hitbox.collides_with(other.hitbox):
+                        # GO AWAY STUPID AI!!!!
+                        ex, ey = entity.position
+                        ox, oy = other.position
+                        entity.set_pos(ex - 5, ey - 5)
+                        other.set_pos(ox + 5, oy + 5)
+
 
             # --- Render ---
             self.screen.fill((0, 0, 0))
