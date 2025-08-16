@@ -131,6 +131,9 @@ class Pawn(Object):
 class Texture:
     @staticmethod
     def static(filename) -> pygame.Surface:
+        pygame.init()
+        pygame.display.set_mode((1, 1))  # tiny dummy window
+
         surf = pygame.image.load(filename)
         return surf.convert_alpha()
 
