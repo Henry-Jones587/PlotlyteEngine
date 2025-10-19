@@ -1,5 +1,10 @@
 import random
 import time
+import getpass
+import subprocess
+try: from pynput import keyboard
+except ImportError: subprocess.run(["pip", "install", "pynput"]); from pynput import keyboard
+
 
 
 class DprintTooLong(Exception):
@@ -8,7 +13,8 @@ class DprintTooLong(Exception):
         super().__init__(self.message)
 
 class DotDot:
-    SyntaxVer = float(1.1)
+    SyntaxVer = float(1.2)
+    styles = {}
     #Thanks to rene-d for all the colour codes!
     colours = {
         "BLACK": "\033[0;30m",
@@ -38,6 +44,46 @@ class DotDot:
     }
     credit = False
     @staticmethod
+    def addstyle(name, code):
+            DotDot.styles[name] = [code]
+            fmt_code = DotDot.colour(name)
+            if fmt_code not in DotDot.styles:
+                DotDot.styles[name] = fmt_code
+
+    @staticmethod
+    def newprint(text, wait=0.05, format=None, end='\n'):
+        if not DotDot.credit:
+            DotDot.credits()
+        try:
+            if format is None:
+                format = ["END"]
+            if DotDot.SyntaxVer < 1.2:
+                raise ValueError("Newprint cannot be used with versions before 1.2. Please either run dprint or change your syntax to 1.2 or later.")
+            if len(text) > 4000:
+                raise DprintTooLong()
+            if len(text) < 1:
+                return None
+            formats = []
+            for item in format:
+                # Check if they added more than one of the same format
+                if item not in DotDot.colours:
+                    formatted_text = DotDot.styles.get(item, "")
+                else:
+                    formatted_text = DotDot.colour(item)
+                
+                if formatted_text and formatted_text not in formats:
+                    formats.append(formatted_text)
+                    print(formatted_text, end="", flush=True)
+            for char in text:
+                print(char, end="", flush=True)
+                time.sleep(wait)
+            print(DotDot.colour("END"), end=end)
+        except DprintTooLong as e:
+            return DotDot.newprint(e.message, wait, format)
+        except ValueError as e:
+            return DotDot.newprint(f"Error: {e}", wait, format)
+
+    @staticmethod
     def dprint(text, wait=0.05, colour=None, bold=False, italic=False, underline=False):
         if not DotDot.credit:
             DotDot.credits()
@@ -48,6 +94,8 @@ class DotDot:
                 return None
             if DotDot.SyntaxVer == 1.0:
                 for char in text:
+                    if char == ".":
+                        time.sleep(wait * 2)
                     print(char, end="", flush=True)
             elif DotDot.SyntaxVer == 1.1:
                 if italic:
@@ -63,8 +111,10 @@ class DotDot:
                     time.sleep(wait)
                 if bold or colour is not None or italic:
                     print(DotDot.colour("END"))
+            elif DotDot.SyntaxVer == 1.2:
+                raise ValueError("Dprint cannot be used with 1.2. Please either run newprint or change your syntax to before 1.2.")
             else:
-                raise ValueError("Invalid SyntaxVer. Please use 1.1 (recommended) or 1.0")
+                raise ValueError("Invalid SyntaxVer. Please use 1.1 or 1.0 for dprint.")
             print()  # New line at the end
         except DprintTooLong as e:
             return DotDot.dprint(e.message, wait)
@@ -73,6 +123,8 @@ class DotDot:
     @staticmethod
     def credits(message="", extended=False):
         DotDot.credit = True
+        old_syntax = DotDot.SyntaxVer
+        DotDot.SyntaxVer = 1.0
         if message != "":
             DotDot.dprint(f"Starting DotDot Utilities for {message}...", 0.05)
         else:
@@ -80,7 +132,8 @@ class DotDot:
         if extended and message != "":
             DotDot.dprint(DotDot.colour("RED") + DotDot.colour("BOLD") + f"DotDot x {message}" + DotDot.colour("END"), 0.05)
         DotDot.dprint("By Henry Jones", 0.05)
-        DotDot.dprint("Version 1.1", 0.05)
+        DotDot.dprint(f"Version {old_syntax}", 0.05)
+        DotDot.SyntaxVer = old_syntax
 
     @staticmethod
     def colour(colour):
@@ -95,8 +148,75 @@ class DotDot:
             print(f"Loading{'.' * (i % 4)}", end='\r')
             time.sleep(0.1)
         print(" " * 20, end='\r')  # Clear the line
-        
 
+    @staticmethod
+    def load_start():
+        DotDot.loading = True
+        while DotDot.loading:
+            for i in range(0,5):
+                print(f"Loading{'.' * (i % 4)}", end='\r')
+                print(" " * 20, end='\r')  # Clear the line
+                print(f"Loading{'.' * (i % 4)}", end='\r')
+                print(" " * 20, end='\r')  # Clear the line
+                time.sleep(0.1)
+            print(" " * 20, end='\r')  # Clear the line
+    def stop_loading():
+        DotDot.loading = False
+        print("Loading complete!")
+
+
+class InputPro:
+    response = ""  # make this a class variable so keybrd can access it
+    
+    def __init__(self, Text, Time=0.05, Style=None):
+        if DotDot.SyntaxVer < 1.2:
+            raise ValueError("InputPro requires DotDot syntaxver to be 1.2.")
+        self.text = Text
+        self.time = Time
+        self.style = Style
+
+    def Input(self):
+        DotDot.newprint(self.text, self.time, self.style, '')
+        self.response = input("")
+        return self.response
+
+    def Hide(self):
+        DotDot.newprint(self.text, self.time, self.style, '')
+        self.response = getpass.getpass("")
+        return self.response
+
+    def Mask(self):
+        InputPro.response = ""  # reset before each run
+        DotDot.newprint(self.text, self.time, self.style, '')
+
+        with keyboard.Listener(
+            on_press=keybrd.on_press,
+            on_release=keybrd.on_release
+        ) as listener:
+            listener.join()
+        print("")
+        return InputPro.response
+
+
+class keybrd:
+    @staticmethod
+    def on_press(key):
+        try:
+            if key == keyboard.Key.backspace:
+                print('\b \b', end='', flush=True)
+                InputPro.response = InputPro.response[:-1]
+            elif key not in (keyboard.Key.esc, keyboard.Key.enter):
+                # Only append printable chars
+                if hasattr(key, 'char') and key.char is not None:
+                    InputPro.response += key.char
+                    print('*', end='', flush=True)
+        except Exception:
+            pass
+
+    @staticmethod
+    def on_release(key):
+        if key in (keyboard.Key.esc, keyboard.Key.enter):
+            return False
 
 
 
@@ -117,6 +237,5 @@ if __name__ == "__main__":
     DotDot.credits()
 
     DotDot.dprint(LoremIpsum, 0.01)
-
 
 
