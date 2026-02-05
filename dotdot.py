@@ -2,8 +2,11 @@ import random
 import time
 import getpass
 import subprocess
-try: from pynput import keyboard
-except ImportError: subprocess.run(["pip", "install", "pynput"]); from pynput import keyboard
+
+# Please keep in mind that Plotlyte only requires normal input for now
+
+#try: from pynput import keyboard
+#except ImportError: subprocess.run(["pip", "install", "pynput"]); from pynput import keyboard
 
 
 
@@ -164,59 +167,60 @@ class DotDot:
         DotDot.loading = False
         print("Loading complete!")
 
+# Not needed currently
 
-class InputPro:
-    response = ""  # make this a class variable so keybrd can access it
+# class InputPro:
+#     response = ""  # make this a class variable so keybrd can access it
     
-    def __init__(self, Text, Time=0.05, Style=None):
-        if DotDot.SyntaxVer < 1.2:
-            raise ValueError("InputPro requires DotDot syntaxver to be 1.2.")
-        self.text = Text
-        self.time = Time
-        self.style = Style
+#     def __init__(self, Text, Time=0.05, Style=None):
+#         if DotDot.SyntaxVer < 1.2:
+#             raise ValueError("InputPro requires DotDot syntaxver to be 1.2.")
+#         self.text = Text
+#         self.time = Time
+#         self.style = Style
 
-    def Input(self):
-        DotDot.newprint(self.text, self.time, self.style, '')
-        self.response = input("")
-        return self.response
+#     def Input(self):
+#         DotDot.newprint(self.text, self.time, self.style, '')
+#         self.response = input("")
+#         return self.response
 
-    def Hide(self):
-        DotDot.newprint(self.text, self.time, self.style, '')
-        self.response = getpass.getpass("")
-        return self.response
+#     def Hide(self):
+#         DotDot.newprint(self.text, self.time, self.style, '')
+#         self.response = getpass.getpass("")
+#         return self.response
 
-    def Mask(self):
-        InputPro.response = ""  # reset before each run
-        DotDot.newprint(self.text, self.time, self.style, '')
+#     def Mask(self):
+#         InputPro.response = ""  # reset before each run
+#         DotDot.newprint(self.text, self.time, self.style, '')
 
-        with keyboard.Listener(
-            on_press=keybrd.on_press,
-            on_release=keybrd.on_release
-        ) as listener:
-            listener.join()
-        print("")
-        return InputPro.response
+#         with keyboard.Listener(
+#             on_press=keybrd.on_press,
+#             on_release=keybrd.on_release
+#         ) as listener:
+#             listener.join()
+#         print("")
+#         return InputPro.response
 
 
-class keybrd:
-    @staticmethod
-    def on_press(key):
-        try:
-            if key == keyboard.Key.backspace:
-                print('\b \b', end='', flush=True)
-                InputPro.response = InputPro.response[:-1]
-            elif key not in (keyboard.Key.esc, keyboard.Key.enter):
-                # Only append printable chars
-                if hasattr(key, 'char') and key.char is not None:
-                    InputPro.response += key.char
-                    print('*', end='', flush=True)
-        except Exception:
-            pass
+# class keybrd:
+#     @staticmethod
+#     def on_press(key):
+#         try:
+#             if key == keyboard.Key.backspace:
+#                 print('\b \b', end='', flush=True)
+#                 InputPro.response = InputPro.response[:-1]
+#             elif key not in (keyboard.Key.esc, keyboard.Key.enter):
+#                 # Only append printable chars
+#                 if hasattr(key, 'char') and key.char is not None:
+#                     InputPro.response += key.char
+#                     print('*', end='', flush=True)
+#         except Exception:
+#             pass
 
-    @staticmethod
-    def on_release(key):
-        if key in (keyboard.Key.esc, keyboard.Key.enter):
-            return False
+#     @staticmethod
+#     def on_release(key):
+#         if key in (keyboard.Key.esc, keyboard.Key.enter):
+#             return False
 
 
 
