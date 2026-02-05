@@ -6,7 +6,16 @@ import time
 from dotdot import *
 DotDot.credits("Plotlyte")
 print("\n"*2)
-DotDot.SyntaxVer = 1.0
+DotDot.SyntaxVer = 1.2
+
+def clear_screen():
+    """Clears the console screen across different operating systems."""
+    # Check the operating system name
+    if os.name == 'nt':
+        _ = os.system('cls')
+    else:
+        _ = os.system('clear')
+
 class Game:
     def __init__(self):
         self.flags = {}
@@ -25,24 +34,24 @@ class Game:
                 with open(path, "r") as f:
                     self.gamedata = json.load(f)
                 DotDot.load()
-                print(f"Loaded game '{self.gamedata.get('title', 'Untitled')}' (version {self.gamedata.get('version', 'unknown')})")
+                DotDot.newprint(f"Loaded game '{self.gamedata.get('title', 'Untitled')}' (version {self.gamedata.get('version', 'unknown')})")
                 return
             else:
-                print(f"File '{path}' not found. Falling back to prompt.")
+                DotDot.newprint(f"File '{path}' not found. Falling back to prompt.")
         # Prompt user for filename if not provided or not found
         while True:
             game = input("Enter the file name of the game (without .json): ").strip()
             if not game:
-                print("You need to enter a file name.")
+                DotDot.newprint("You need to enter a file name.")
                 continue
             path = f"{game}.json"
             if not os.path.exists(path):
-                print(f"File '{path}' not found. Try again.")
+                DotDot.newprint(f"File '{path}' not found. Try again.")
                 continue
             with open(path, "r") as f:
                 self.gamedata = json.load(f)
             DotDot.load()
-            print(f"Loaded game '{self.gamedata.get('title', 'Untitled')}' (version {self.gamedata.get('version', 'unknown')})")
+            DotDot.newprint(f"Loaded game '{self.gamedata.get('title', 'Untitled')}' (version {self.gamedata.get('version', 'unknown')})")
             break
 
     def check_condition(self, condition):
@@ -69,34 +78,34 @@ class Game:
             if effect == "add_item":
                 if value not in self.inventory:
                     self.inventory.append(value)
-                    DotDot.dprint(DotDot.colour("BLUE") + f"You picked up a {self.gamedata['items'][value]['name']}!" + DotDot.colour("END"))
+                    DotDot.newprint(DotDot.colour("BLUE") + f"You picked up a {self.gamedata['items'][value]['name']}!" + DotDot.colour("END"))
             elif effect == "remove_item":
                 if value in self.inventory:
                     self.inventory.remove(value)
-                    DotDot.dprint(DotDot.colour("RED") + f"You lost: {value}!" + DotDot.colour("END"))
+                    DotDot.newprint(DotDot.colour("RED") + f"You lost: {value}!" + DotDot.colour("END"))
             elif effect == "set_flag":
                 self.flags[value] = True
             elif effect == "clear_flag":
                 self.flags[value] = False
             elif effect == "restore_hp":
                 # Placeholder for future health system
-                print(f"You restore {value} HP. (Health system not implemented yet.)")
+                DotDot.newprint(f"You restore {value} HP. (Health system not implemented yet.)")
             else:
-                print(f"Unknown effect: {effect} = {value}")
+                DotDot.newprint(f"Unknown effect: {effect} = {value}")
 
     def run(self):
         current_stage = self.gamedata.get("start")
         if not current_stage:
-            print("Error: No start stage defined in the game file.")
+            DotDot.newprint("Error: No start stage defined in the game file.")
             return
 
         while True:
             stage = self.gamedata["stages"].get(current_stage)
             if not stage:
-                print(f"Error: Stage '{current_stage}' not found.")
+                DotDot.newprint(f"Error: Stage '{current_stage}' not found.")
                 return
 
-            DotDot.dprint("\n" + DotDot.colour("YELLOW") + stage["description"], 0.01)
+            DotDot.newprint("\n" + DotDot.colour("YELLOW") + stage["description"], 0.01)
             # Filter options by condition
             available_options = [
                 option for option in stage["options"]
@@ -104,32 +113,35 @@ class Game:
             ]
 
             if not available_options:
-                DotDot.dprint("Thanks for playing!")
+                DotDot.newprint("Thanks for playing!")
                 break
 
-            DotDot.dprint("\nOptions:")
+            DotDot.newprint("\nOptions:")
             for i, option in enumerate(available_options, 1):
-                DotDot.dprint(f"{i}. {option['label']}")
+                DotDot.newprint(f"{i}. {option['label']}")
 
-            DotDot.dprint(DotDot.colour("GREEN") + "Type the number of your choice, or 'inventory' to see your items, or 'quit' to exit." + DotDot.colour("END"))
+            DotDot.newprint(DotDot.colour("GREEN") + "Type the number of your choice, or 'inventory' to see your items, or 'quit' to exit." + DotDot.colour("END"))
 
             choice = input("> ").strip().lower()
+            
+            clear_screen()
+
             if choice == "quit":
-                DotDot.dprint("Thanks for playing!" + DotDot.colour("END"))
+                DotDot.newprint("Thanks for playing!" + DotDot.colour("END"))
                 break
             elif choice == "inventory":
                 if self.inventory:
-                    DotDot.dprint("You have:")
+                    DotDot.newprint("You have:")
                     for item in self.inventory:
                         item_data = self.gamedata.get("items", {}).get(item)
                         name = item_data["name"] if item_data else item
-                        DotDot.dprint(f"- {name}")
+                        DotDot.newprint(f"- {name}")
                 else:
-                    DotDot.dprint("Your inventory is empty.")
+                    DotDot.newprint("Your inventory is empty.")
                 continue
 
             if not choice.isdigit() or int(choice) < 1 or int(choice) > len(available_options):
-                DotDot.dprint(DotDot.colour("RED") + "Invalid choice. Try again." + DotDot.colour("END"))
+                DotDot.newprint(DotDot.colour("RED") + "Invalid choice. Try again." + DotDot.colour("END"))
                 continue
 
             selected_option = available_options[int(choice) - 1]
